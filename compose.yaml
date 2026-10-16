@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:16
+    container_name: postgres_students
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: students_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database_students.sql:/docker-entrypoint-initdb.d/database_students.sql:ro
+
+  web:
+    build: .
+    container_name: flask_students
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: students_db
+      DB_USER: postgres
+      DB_PASSWORD: postgres123
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
